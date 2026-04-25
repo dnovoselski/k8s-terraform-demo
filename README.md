@@ -26,9 +26,6 @@ Estimated cost while running: roughly $4–6 per day. (EKS control plane $0.10/h
 
 attach these 3 inline IAM policy to your deployment IAM user
 
-name: TerraformEKS-EC2
-
-
 ### TerraformEKS-EC2
 ```json
 {
