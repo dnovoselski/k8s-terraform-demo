@@ -107,14 +107,28 @@ name: TerraformEKS-EC2
 ```
 ## Deploy
 
+Clone the repository:
+```bash
 git clone <this-repo>
 cd terraform-eks-private
-cp terraform.tfvars.example terraform.tfvars   # edit if you want different values
-sed -i 's/default     = true/default     = false/' variables.tf # <-- By default deployment creates VPC endpoints for internal AWS traffic. This command removes it. 
+```
 
+Copy and edit variables:
+```bash
+cp terraform.tfvars.example terraform.tfvars   # edit if you want different values
+```
+
+> ⚠️ By default, deployment creates VPC endpoints for internal AWS traffic. To disable them:
+> ```bash
+> sed -i 's/default     = true/default     = false/' variables.tf
+> ```
+
+Initialize and deploy:
+```bash
 terraform init
 terraform plan
-terraform apply 
+terraform apply
+```
 
 ## Validation
 Expected result after deployment
