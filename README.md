@@ -28,6 +28,9 @@ attach these 3 inline IAM policy to your deployment IAM user
 
 name: TerraformEKS-EC2
 
+
+### TerraformEKS-EC2
+```json
 {
     "Version": "2012-10-17",
     "Statement": [
@@ -59,9 +62,10 @@ name: TerraformEKS-EC2
         }
     ]
 }
+```
 
-name: TerraformEKS-EKSAndIAM
-
+### TerraformEKS-EKSAndIAM
+```json
 {
     "Version": "2012-10-17",
     "Statement": [
@@ -79,9 +83,10 @@ name: TerraformEKS-EKSAndIAM
         }
     ]
 }
+```
 
-name: TerraformEKS-Supporting
-
+### TerraformEKS-Supporting
+```json
 {
     "Version": "2012-10-17",
     "Statement": [
@@ -180,9 +185,9 @@ dig +short aff9646bd0ae8438f94fe8d5afd755c8-a7b18f7b59fc3e84.elb.eu-central-1.am
 kubectl delete -f k8s-manifests/nginx.yaml   # <--delete LB first (frees ENIs)
 terraform destroy # <-- if hangs on deleting SG, delete leftover ENIs manualy
 
-
+===========================================
 Destroy complete! Resources: 64 destroyed.
-
+===========================================
 
 NB : Do not forget to delete deploying IAM user!
 
