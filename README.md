@@ -106,7 +106,7 @@ attach these 3 inline IAM policy to your deployment IAM user
 
 Clone the repository:
 ```bash
-git clone <this-repo>
+git clone git@github.com:dnovoselski/k8s-terraform-demo.git
 cd terraform-eks-private
 ```
 
