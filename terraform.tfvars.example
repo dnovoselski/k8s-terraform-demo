@@ -1,0 +1,4 @@
+aws_region   = "eu-central-1"
+project_name = "fadata-demo"
+environment  = "dev"
+cluster_name = "fadata-demo-eks"
