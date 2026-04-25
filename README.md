@@ -117,13 +117,12 @@ terraform plan
 terraform apply 
 
 ## Validation
-
 Expected result after deployment
 
+```
 Apply complete! Resources: 64 added, 0 changed, 0 destroyed.
 
 Outputs:
-
 cluster_endpoint = "https://1AA4ECE0A0548BBEB27580947E183692.gr7.eu-central-1.eks.amazonaws.com"
 cluster_name = "fadata-demo-eks"
 cluster_region = "eu-central-1"
@@ -137,59 +136,79 @@ public_subnet_ids = [
   "subnet-0b02fe3099372691a",
 ]
 vpc_id = "vpc-06b4081cd630ffc6b"
+```
 
------------------------------------------
-
-aws eks update-kubeconfig --region eu-central-1 --name fadata-demo-eks ## <-- configure kubectl
-
+Configure kubectl:
+```bash
+aws eks update-kubeconfig --region eu-central-1 --name fadata-demo-eks
+```
+```
 Updated context arn:aws:eks:eu-central-1:999999999999:cluster/fadata-demo-eks in /home/user/.kube/your-k8s-config
+```
 
+Check that nodes are in private subnets:
+```bash
+kubectl get nodes
+```
+```
+NAME                                               STATUS   ROLES    AGE     VERSION
+ip-10-0-11-91.eu-central-1.compute.internal        Ready    <none>   5m17s   v1.30.14-eks-bbe087e
+ip-10-0-12-75.eu-central-1.compute.internal        Ready    <none>   5m17s   v1.30.14-eks-bbe087e
+```
 
-----------------------------------------
-
-kubectl get nodes # <-- check that nodes are in private subnets
-
-NAME                                          STATUS   ROLES    AGE     VERSION
-ip-10-0-11-91.eu-central-1.compute.internal   Ready    <none>   5m17s   v1.30.14-eks-bbe087e
-ip-10-0-12-75.eu-central-1.compute.internal   Ready    <none>   5m17s   v1.30.14-eks-bbe087e
-
-----------------------------------------
-
-kubectl apply -f k8s-manifests/nginx.yaml # <-- deploy Nginx to test deployment
-
+Deploy Nginx to test deployment:
+```bash
+kubectl apply -f k8s-manifests/nginx.yaml
+```
+```
 deployment.apps/nginx created
 service/nginx created
+```
 
----------------------------------------
-kubectl get pods -o wide # <-- Pods run on private nodes
+Pods run on private nodes:
+```bash
+kubectl get pods -o wide
+```
+```
+NAME                     READY   STATUS    RESTARTS   AGE   IP            NODE
+nginx-788b78898d-4kxr9   1/1     Running   0          25s   10.0.11.225   ip-10-0-11-91.eu-central-1.compute.internal
+nginx-788b78898d-xplqq   1/1     Running   0          25s   10.0.12.51    ip-10-0-12-75.eu-central-1.compute.internal
+```
 
-NAME                     READY   STATUS    RESTARTS   AGE   IP            NODE                                          NOMINATED NODE   READINESS GATES
-nginx-788b78898d-4kxr9   1/1     Running   0          25s   10.0.11.225   ip-10-0-11-91.eu-central-1.compute.internal   <none>           <none>
-nginx-788b78898d-xplqq   1/1     Running   0          25s   10.0.12.51    ip-10-0-12-75.eu-central-1.compute.internal   <none>           <none>
-
----------------------------------------
-
-kubectl get svc nginx # <-- check if service load balancer is internal. 
-
-NAME    TYPE           CLUSTER-IP      EXTERNAL-IP                                                                        PORT(S)        AGE
+Check if service load balancer is internal:
+```bash
+kubectl get svc nginx
+```
+```
+NAME    TYPE           CLUSTER-IP      EXTERNAL-IP                                                                    PORT(S)        AGE
 nginx   LoadBalancer   172.20.85.225   aff9646bd0ae8438f94fe8d5afd755c8-a7b18f7b59fc3e84.elb.eu-central-1.amazonaws.com   80:32748/TCP   3m18s
+```
 
---------------------------------------
-
-dig +short aff9646bd0ae8438f94fe8d5afd755c8-a7b18f7b59fc3e84.elb.eu-central-1.amazonaws.com # <-- Checking DNS of EXTERNAL-IP. Expecting private IPs
+Check DNS of EXTERNAL-IP — expecting private IPs:
+```bash
+dig +short aff9646bd0ae8438f94fe8d5afd755c8-a7b18f7b59fc3e84.elb.eu-central-1.amazonaws.com
+```
+```
 10.0.12.142
 10.0.11.148
+```
 
 ## Destroy
 
-kubectl delete -f k8s-manifests/nginx.yaml   # <--delete LB first (frees ENIs)
-terraform destroy # <-- if hangs on deleting SG, delete leftover ENIs manualy
+Delete Load Balancer first (frees ENIs):
+```bash
+kubectl delete -f k8s-manifests/nginx.yaml
+```
 
-===========================================
+Destroy infrastructure:
+```bash
+terraform destroy
+```
+> ⚠️ If `terraform destroy` hangs on deleting Security Groups, delete leftover ENIs manually.
+
+```
 Destroy complete! Resources: 64 destroyed.
-===========================================
+```
 
-NB : Do not forget to delete deploying IAM user!
-
-
+> ⚠️ Do not forget to delete the deploying IAM user!
 
