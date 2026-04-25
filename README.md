@@ -104,7 +104,7 @@ name: TerraformEKS-EC2
         }
     ]
 }
-
+```
 ## Deploy
 
 git clone <this-repo>
